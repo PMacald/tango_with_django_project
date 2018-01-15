@@ -6,8 +6,10 @@ from rango.models import Page
 def index(request):
 
     category_list = Category.objects.order_by('-likes')[:5]
+    page_list = Page.objects.order_by('-views')[:5]
     #link to template and provide dictionary for Django variables within templates
-    context_dict = {'categories': category_list}
+    context_dict = {'categories': category_list,
+                    'pages': page_list}
 
     #Get rendered response for client and return it
     return render(request, 'rango/index.html', context_dict)
