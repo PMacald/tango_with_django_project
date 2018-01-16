@@ -1,6 +1,7 @@
 {% extends "rango/base.html" %}
 {% load staticfiles %}
 
+					
 {% block title_block %}
 	{{ category.name }}
 {% endblock %}
@@ -9,6 +10,7 @@
 	
 	{% if category %}
 		<hl>{{ category.name }}</h1>
+			
 		{% if pages %}
 			<ul>
 			{% for page in pages %}
@@ -22,5 +24,4 @@
 	{% else %}
 		The specified category does not exist!
 	{% endif %}
-
 {% endblock %}
