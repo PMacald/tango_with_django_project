@@ -1,8 +1,8 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-# Create your models here.
+from django.contrib.auth.models import User
 
-
+#Models
 class Category(models.Model):
     name_max_length = 128
     name = models.CharField(max_length=name_max_length, unique=True)
@@ -38,3 +38,18 @@ class Page(models.Model):
     #for unicode support of Python 2.x
     def __unicode__(self):
         return self.title
+
+class UserProfile(models.Model):
+    #link UserProfile to user
+    user = models.OneToOneField(User)
+
+    #Extra attributes to include
+    website = models.URLField(blank=True)
+    picture = models.ImageField(upload_to='profile_images',blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+    #for unicode support of Python 2.x
+    def __unicode__(self):
+        return self.user.username    

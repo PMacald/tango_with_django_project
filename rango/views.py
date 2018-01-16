@@ -4,6 +4,7 @@ from rango.models import Category
 from rango.models import Page
 from rango.forms import CategoryForm
 from rango.forms import PageForm
+from rango.forms import UserForm, UserProfileForm
 
 def index(request):
 
@@ -83,3 +84,44 @@ def add_page(request, category_name_slug):
 
     context_dict = {'form':form, 'category': category}
     return render(request, 'rango/add_page.html', context_dict)
+
+def register(request):
+    # Shows whether registration was successful
+    registered = False
+
+    # If it's HTTP POST, we want the info from the form
+    if request.method == 'POST':
+        # Try to gather information
+        user_form = UserForm(data=request.POST)
+        profile_form = UserProfileForm(data=request.POST)
+
+        # If the forms are valid, save the user's form data
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            # If a picture is provided, we want to include that in the profile
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES('picture')
+
+            # Save profile to db
+            profile.save()
+
+            # Show registration was successful
+            registered = True
+        else:
+            # Print problems to terminal
+            print(user_form.errors, profile_form.errors)
+    else:
+        # Not HTTP POST, so we present forms for user input
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    #Render template based on context
+    return render(request,
+                  'rango/register.html',
+                  {'user_form': user_form,
+                   'profile_form': profile_form,
+                   'registered': registered})
+            
