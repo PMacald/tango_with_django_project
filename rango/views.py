@@ -5,6 +5,10 @@ from rango.models import Page
 from rango.forms import CategoryForm
 from rango.forms import PageForm
 from rango.forms import UserForm, UserProfileForm
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseRedirect, HttpResponse
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
 def index(request):
 
@@ -125,3 +129,37 @@ def register(request):
                    'profile_form': profile_form,
                    'registered': registered})
             
+def user_login(request):
+    if request.method == 'POST':
+        # Get username and password from request
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Check validity of username and password
+        user = authenticate(username=username, password=password)
+
+        # If user exists, the details are correct
+        if user:
+            if user.is_active:
+                login(request,user)
+                # Send user to homepage
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                return HttpResponse('Your Rango account is disabled')
+        else:
+            print('Invalid login details: {0}, {1}'.format(username,password))
+            return HttpResponse("Invalid login details supplied.")
+    else:
+        # Not a POST method, so we can't use context variables
+        return render(request, 'rango/login.html',{})
+                                
+@login_required
+def restricted(request):
+    return render(request, 'rango/restricted.html',{})
+
+
+@login_required
+def user_logout(request):
+    logout(request)
+    # Redirect to homepage
+    return HttpResponseRedirect(reverse('index'))
