@@ -51,7 +51,7 @@ def populate():
 
     #Iterate over cats dict and add each category, then add all associated pages
     for cat, cat_data in cats.items():
-        c = add_cat(cat,cat_data["views"],cat_data["views"])
+        c = add_cat(cat,cat_data["views"],cat_data["likes"])
         for p in cat_data["pages"]:
             add_page(c, p["title"], p["url"], p["views"])
 
