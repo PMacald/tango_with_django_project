@@ -9,23 +9,36 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 def index(request):
-
+    
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
     #link to template and provide dictionary for Django variables within templates
     context_dict = {'categories': category_list,
                     'pages': page_list}
-
-    #Get rendered response for client and return it
-    return render(request, 'rango/index.html', context_dict)
+    # Call helper function to handle cookies
+    visitor_cookie_handler(request)
+    context_dict['visits'] = request.session['visits']
+    
+    # Get response early so we can gather cookie info
+    response = render(request, 'rango/index.html', context_dict)
+    #Get response for client and return it (updating cookies if need be) 
+    return response
 
 def about(request):
     #link to template and provide dictionary for Django variables within templates
     context_dict = {'aboutmessage': "rango says here is the about page. This tutorial has been put together by Peter Macaldowie."}
-    #Get rendered response for client
-    return render(request, 'rango/about.html', context=context_dict)
+
+    # Call helper function to handle cookies
+    visitor_cookie_handler(request)
+    context_dict['visits'] = request.session['visits']
+    
+    # Get response early so we can gather cookie info
+    response = render(request, 'rango/about.html', context_dict)
+    #Get response for client and return it (updating cookies if need be) 
+    return response
 
 def show_category(request, category_name_slug):
     context_dict = {}
@@ -163,3 +176,34 @@ def user_logout(request):
     logout(request)
     # Redirect to homepage
     return HttpResponseRedirect(reverse('index'))
+
+# Helper method
+def get_server_side_cookie(request,cookie,default_val=None):
+    val = request.session.get(cookie)
+    if not val:
+        val = default_val
+    return val
+
+def visitor_cookie_handler(request):
+    # Use cookies to track number of visits. If a previous cookie exists, we can say they've visited before
+    # Default value is 1
+    visits = int(get_server_side_cookie(request,'visits','1'))
+
+    last_visit_cookie = get_server_side_cookie(request,
+                                               'last_visit',
+                                               str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7],
+                                        '%Y-%m-%d %H:%M:%S')
+
+    # If time since last visit > 1 day, add a visit
+    if (datetime.now() - last_visit_time).days > 0:
+        visits = visits + 1
+        # Update last visit cookie
+        request.session['last_visit'] = str(datetime.now())
+    else:
+        visits = 1
+        # Set last visit cookie
+        request.session['last_visit'] = last_visit_cookie
+
+    # Update visits cookie
+    request.session['visits'] = visits
