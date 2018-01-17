@@ -23,7 +23,7 @@ def index(request):
 
 def about(request):
     #link to template and provide dictionary for Django variables within templates
-    context_dict = {'aboutmessage': "This tutorial has been put together by Peter Macaldowie."}
+    context_dict = {'aboutmessage': "rango says here is the about page. This tutorial has been put together by Peter Macaldowie."}
     #Get rendered response for client
     return render(request, 'rango/about.html', context=context_dict)
 
