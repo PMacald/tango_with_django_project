@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from rango.webhose_search import run_query
 
 def index(request):
     
@@ -207,3 +208,13 @@ def visitor_cookie_handler(request):
 
     # Update visits cookie
     request.session['visits'] = visits
+
+def search(request):
+    result_list = []
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+        if query:
+            # Run our Webhose search function to get the results list!
+            result_list = run_query(query)
+            
+    return render(request, 'rango/search.html', {'result_list': result_list})
