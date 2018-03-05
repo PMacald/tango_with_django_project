@@ -28,4 +28,5 @@ urlpatterns = [
     #^this makes sure all urls starting with rango/
     #are handled by the app
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/', include('registration.backend.simple.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
