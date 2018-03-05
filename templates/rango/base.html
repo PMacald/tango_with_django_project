@@ -37,6 +37,9 @@
 				<li>
 					<a href="{% url 'add_category' %}">Add a New Category</a>
 				</li>
+				<li>
+					<a href="accounts/password/change">Change Password</a>
+				</li>
 				{% else %}
 				<li>
 					<a href="{% url 'auth_login'%}">Sign In</a>
@@ -44,6 +47,7 @@
 				<li>
 					<a href="{% url 'registration_register' %}">Sign Up</a>
 				</li>
+				
 				{% endif %}
 
 
